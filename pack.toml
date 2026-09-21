@@ -1,0 +1,4 @@
+[custom.all.FinSc-Epoch]
+type = "local"
+path = "."
+ipkg = "FinSc-Epoch.ipkg"

@@ -1,0 +1,19 @@
+package FinSc-Epoch
+version = 0.1.3
+authors = "Justin Kelly"
+brief   = "37-Epoch Cosmic Evolution, Chromogeometric Dark Energy Accumulation & Goh Prime 13 Engine"
+
+depends = base, linear, FinSc-Geometry, FinSc-Multiset-Core, FinSc-Multiset-Transform, FinSc-Cosmology
+sourcedir = "src"
+
+modules = Epoch,
+          Epoch.ChromogeometryLaw,
+          Epoch.GohStreamTransducer,
+          Epoch.ExpansionCollapse,
+          Epoch.Trajectory,
+          Epoch.TwoLevelConjugateHylo,
+          Epoch.ThreeLevelConjugateHylo,
+          Epoch.Observer37Hypothesis,
+          Epoch.ObserverFixedPoint,
+          Epoch.PrimeGohFactorization,
+          Epoch.StateSpaceExhaustion
