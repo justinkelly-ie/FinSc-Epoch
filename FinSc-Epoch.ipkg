@@ -7,13 +7,14 @@ depends = base, linear, FinSc-Geometry, FinSc-Multiset-Core, FinSc-Multiset-Tran
 sourcedir = "src"
 
 modules = Epoch,
-          Epoch.ChromogeometryLaw,
-          Epoch.GohStreamTransducer,
-          Epoch.ExpansionCollapse,
-          Epoch.Trajectory,
-          Epoch.TwoLevelConjugateHylo,
-          Epoch.ThreeLevelConjugateHylo,
-          Epoch.Observer37Hypothesis,
-          Epoch.ObserverFixedPoint,
-          Epoch.PrimeGohFactorization,
-          Epoch.StateSpaceExhaustion
+          Stage0.Epoch.GohStreamTransducer,
+          Stage0.Epoch.PrimeGohFactorization,
+          Stage0.Epoch.StateSpaceExhaustion,
+          Stage0.Epoch.StreamingUniverse,
+          Stage0.Epoch.ThreeLevelConjugateHylo,
+          Stage0.Epoch.TwoLevelConjugateHylo,
+          Stage1.Epoch.ChromogeometryLaw,
+          Stage1.Epoch.ExpansionCollapse,
+          Stage1.Epoch.Observer37Hypothesis,
+          Stage1.Epoch.ObserverFixedPoint,
+          Stage1.Epoch.Trajectory
