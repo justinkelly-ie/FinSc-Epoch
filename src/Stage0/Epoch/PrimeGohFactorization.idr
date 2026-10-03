@@ -8,6 +8,8 @@ import public Stage0.Epoch.GohStreamTransducer
 import public Stage1.Epoch.ExpansionCollapse
 import public Stage1.Epoch.Trajectory
 
+import public Stage1.MetricSignature
+
 %default total
 
 --------------------------------------------------------------------------------
@@ -44,6 +46,42 @@ gohPrimeToMetricLaw 11 = Just HyperbolicGreen
 gohPrimeToMetricLaw 13 = Just EllipticRed
 gohPrimeToMetricLaw _  = Nothing
 
+||| Maps a 13-smooth prime factor directly to its canonical discrete multiset MetricSignature over {-1, 0, 1}.
+public export
+gohPrimeToMetricSignature : Nat -> Maybe Stage1.MetricSignature.MetricSignature
+gohPrimeToMetricSignature 2  = Just substrateSignature2D
+
+gohPrimeToMetricSignature 3  = Just ellipticSignature2D
+gohPrimeToMetricSignature 5  = Just parabolicSignature2D
+gohPrimeToMetricSignature 7  = Just substrateSignature2D
+gohPrimeToMetricSignature 11 = Just hyperbolicSignature2D
+gohPrimeToMetricSignature 13 = Just ellipticSignature2D
+gohPrimeToMetricSignature _  = Nothing
+
+||| Evaluates the exact quadrance of a coordinate displacement (dx, dy) under a 13-smooth prime metric.
+public export
+gohPrimeQuadrance : Nat -> (BoxInt, BoxInt) -> Maybe BoxInt
+gohPrimeQuadrance p (x, y) =
+  case gohPrimeToMetricSignature p of
+    Just sig => Just (signatureQuadrance2D sig x y)
+    Nothing  => Nothing
+
+
+||| QTT 0 erased proof witness verifying exact prime 3 elliptic quadrance of (4, 3) is 25.
+public export
+0 prfPrime3Quadrance25 : gohPrimeQuadrance 3 (MkBoxInt 4, MkBoxInt 3) = Just (MkBoxInt 25)
+prfPrime3Quadrance25 = Refl
+
+||| QTT 0 erased proof witness verifying exact prime 11 hyperbolic quadrance of (5, 4) is 9.
+public export
+0 prfPrime11Quadrance9 : gohPrimeQuadrance 11 (MkBoxInt 5, MkBoxInt 4) = Just (MkBoxInt 9)
+prfPrime11Quadrance9 = Refl
+
+||| QTT 0 erased proof witness verifying exact prime 5 parabolic quadrance of (3, 7) is 9.
+public export
+0 prfPrime5Quadrance9 : gohPrimeQuadrance 5 (MkBoxInt 3, MkBoxInt 7) = Just (MkBoxInt 9)
+prfPrime5Quadrance9 = Refl
+
 ||| Helper to check if a prime metric law mapping exists.
 public export
 isJustLaw : Maybe ChromogeometryLaw -> Bool
@@ -64,6 +102,7 @@ auditPrimeMetricIsomorphismSoundness =
 public export
 0 verifyPrimeMetricIsomorphismSoundness : Stage0.Epoch.PrimeGohFactorization.auditPrimeMetricIsomorphismSoundness = True
 verifyPrimeMetricIsomorphismSoundness = Refl
+
 
 --------------------------------------------------------------------------------
 -- 3. AFFINE-TO-MONOID ADJOINT FUNCTOR INSTANCE (F_Affine ⊣ U_Monoid)

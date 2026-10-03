@@ -89,20 +89,6 @@ verifyEpoch37TriangularResidue = Refl
 -- 4. 137-SCALE FINE STRUCTURE HORIZON & ITERATION 37 OBSERVER WITNESSES
 --------------------------------------------------------------------------------
 
-||| Gate-pure 13-smooth scales count across the fine structure hierarchy.
-public export
-gatePureScaleCount : Nat
-gatePureScaleCount = 76
-
-||| Decoherent scales count across the fine structure hierarchy.
-public export
-decoherentScaleCount : Nat
-decoherentScaleCount = 61
-
-||| Total fundamental cosmic scale hierarchy derived from fine structure constant alpha^-1 = 76 + 61 = 137.
-public export
-totalCosmicScaleHierarchy : Nat
-totalCosmicScaleHierarchy = gatePureScaleCount + decoherentScaleCount
 
 ||| Current observable universe epoch iteration (Iteration 37).
 public export

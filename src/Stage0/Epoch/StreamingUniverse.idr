@@ -9,6 +9,7 @@ import public Stage2.ThreeLevel
 import public Geometry
 import public Stage0.Cosmology.StreamingCosmology
 import public Stage1.Epoch.ChromogeometryLaw
+import public Stage1.FourGeometries
 import public Stage1.Epoch.ExpansionCollapse
 import public Stage0.Epoch.GohStreamTransducer
 import public Stage0.Epoch.TwoLevelConjugateHylo
@@ -48,7 +49,7 @@ hyperCycleOnSeq = MkOnSeq 1 (\u => (u ** loadThreeLevelEpochState u 1 (MkEpochSt
 public export
 cosmologyToEpochStream : FusedStream CyclicCosmicEpoch -> FusedStream EpochState
 cosmologyToEpochStream strm =
-  mapStream (\(MkCyclicEpoch ep (MkConcrete c) dark) => MkEpochState ep c hyperbolicRomCapacity emptyLawLedger) strm
+  mapStream (\(MkCyclicEpoch ep (MkConcrete c) dark) => MkEpochState ep c Stage1.FourGeometries.hyperbolicRomCapacity emptyLawLedger) strm
 
 ||| Deforested 2LTT stream transducer advancing StrictEpoch states over Fuel.
 public export
@@ -59,6 +60,20 @@ fused2LTTEpochStream f seedStrict = MkStream nextStep (1, seedStrict)
     nextStep (curr, s@(MkStrict st)) =
       let s' = epochAlgebra (epochNaturalTransform s)
       in Yield s (S curr, s')
+
+||| Deforested 2LTT stream transducer advancing StrictEpoch states bounded by exact epoch count.
+||| Fully total without Fuel, terminating when reaching maxEpochs.
+public export
+fused2LTTEpochStreamBounded : (maxEpochs : Nat) -> StrictEpoch -> FusedStream StrictEpoch
+fused2LTTEpochStreamBounded maxEpochs seedStrict = MkStream nextStep (1, seedStrict)
+  where
+    nextStep : (Nat, StrictEpoch) -> Step (Nat, StrictEpoch) StrictEpoch
+    nextStep (curr, s@(MkStrict st)) =
+      if curr > maxEpochs then Done
+      else
+        let s' = epochAlgebra (epochNaturalTransform s)
+        in Yield s (S curr, s')
+
 
 ||| Deforested Quad-Stream simulation stream advancing QuadStreamMultiset payloads over Fuel.
 public export
@@ -128,6 +143,14 @@ fused3LTTCosmicUniverseStream f seedCosmo =
 -- 3. FUSED HYLOMORPHISM PARALLEL & SEQUENTIAL CATAMORPHISMS
 --------------------------------------------------------------------------------
 
+||| Evaluates total accumulated visible baryonic mass across N 2LTT stream steps using structural Nat recursion.
+public export
+fusedComputeCosmicEnergyTrajectoryNat : (steps : Nat) -> StrictEpoch -> BoxInt
+fusedComputeCosmicEnergyTrajectoryNat Z _ = intToBoxInt 0
+fusedComputeCosmicEnergyTrajectoryNat (S k) s@(MkStrict st) =
+  let s' = epochAlgebra (epochNaturalTransform s)
+  in natToBoxInt (visibleBaryons st) + fusedComputeCosmicEnergyTrajectoryNat k s'
+
 ||| Evaluates total accumulated visible baryonic mass across N 2LTT stream steps using fusedHylomorphism.
 public export covering
 fusedComputeCosmicEnergyTrajectory : Fuel -> StrictEpoch -> BoxInt
@@ -139,6 +162,16 @@ fusedComputeCosmicEnergyTrajectory f seedStrict =
     (\st, acc => natToBoxInt (visibleBaryons st) + acc)
     (intToBoxInt 0)
     (1, seedStrict)
+
+||| Evaluates total dark matter laws accumulated across 3LTT hyper-cycle steps using structural Nat recursion.
+public export
+fusedComputeHyperCycleDarkLawsAccumulationNat : (steps : Nat) -> (u : Nat) -> (e : Nat) -> EpochState -> BoxInt
+fusedComputeHyperCycleDarkLawsAccumulationNat Z _ _ _ = intToBoxInt 0
+fusedComputeHyperCycleDarkLawsAccumulationNat (S k) u e st =
+  let tokenLaws = natToBoxInt (countTotalDarkLaws st.darkMatterLedger)
+      nextSt = advanceEpochState st
+      (nextU, nextE) = if e >= 137 then (S u, 1) else (u, S e)
+  in tokenLaws + fusedComputeHyperCycleDarkLawsAccumulationNat k nextU nextE nextSt
 
 ||| Evaluates total dark matter laws accumulated across 3LTT hyper-cycle stream steps.
 public export covering
@@ -164,15 +197,13 @@ public export
 0 verifyStreamingUniverse2LTTDuality : (s : StrictEpoch) -> reflectPathToStrict (ReflP {x = True}) = Refl
 verifyStreamingUniverse2LTTDuality _ = Refl
 
-||| Audit witness verifying 2LTT and 3LTT streaming universe pipeline execution.
-public export covering
+||| Audit witness verifying 2LTT and 3LTT streaming universe pipeline execution with total Nat bounds.
+public export
 auditStreamingUniverseProof : Bool
 auditStreamingUniverseProof =
   let genesisStrict = MkStrict initGenesisEpoch
-      totEnergy = fusedComputeCosmicEnergyTrajectory (limit 13) genesisStrict
+      totEnergy = fusedComputeCosmicEnergyTrajectoryNat 13 genesisStrict
       clipEx = getEpochClip initGenesisEpoch 1 5
-      totDarkLaws = fusedComputeHyperCycleDarkLawsAccumulation (limit 13) 1 1 initGenesisEpoch
-      initCosmo = MkCyclicEpoch 1 (MkConcrete 27) ZeroM
-      cosmo3LTT = fused3LTTCosmicUniverseStream (limit 5) initCosmo
-  in unwrapBox totEnergy > 0 && length (elements clipEx) == 5
+      totDarkLaws = fusedComputeHyperCycleDarkLawsAccumulationNat 13 1 1 initGenesisEpoch
+  in unwrapBox totEnergy > 0 && length (elements clipEx) == 5 && unwrapBox totDarkLaws >= 0
 

@@ -54,6 +54,14 @@ cycleAdjointTransducer : {u : Nat} -> ThreeLevelEpochState u 137 -> ThreeLevelEp
 cycleAdjointTransducer {u} (MkHyperCycle (MkCycleState _ _ _)) =
   loadThreeLevelEpochState (S u) 1 (MkEpochState 1 0 128 ZeroM)
 
+||| Structurally total 3LTT Hyper-Cycle evolution bounded by exact step count.
+public export
+eval3LTTCycleConjugateHyloNat : {u : Nat} -> {e : Nat} -> (steps : Nat) -> ThreeLevelEpochState u e -> (e' : Nat ** ThreeLevelEpochState u e')
+eval3LTTCycleConjugateHyloNat {e} Z st = (e ** st)
+eval3LTTCycleConjugateHyloNat {u} {e} (S k) (MkHyperCycle (MkCycleState _ _ st)) =
+  let st' = advanceEpochState st
+  in eval3LTTCycleConjugateHyloNat k (MkHyperCycle (mkCycleState u (S e) st'))
+
 ||| Evaluates deforested 3LTT Hyper-Cycle evolution over Fuel.
 public export covering
 eval3LTTCycleConjugateHylo : {u : Nat} -> {e : Nat} -> Fuel -> ThreeLevelEpochState u e -> (e' : Nat ** ThreeLevelEpochState u e')

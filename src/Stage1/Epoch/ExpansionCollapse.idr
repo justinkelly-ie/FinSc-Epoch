@@ -6,6 +6,7 @@ import public Stage0.OnSeq.FusedStream
 import public Stage1.QuadStream
 import public Cosmology
 import public Stage1.Cosmology.MultisetAdjunction
+import public Stage1.FourGeometries
 import public Stage1.FourGeometriesActions
 import Stage1.Epoch.ChromogeometryLaw
 
@@ -33,7 +34,7 @@ Show EpochState where
 ||| Genesis Empty Vacuum Initial State (Epoch 1 bootstrapped from ZeroM).
 public export
 initGenesisEpoch : EpochState
-initGenesisEpoch = MkEpochState 1 0 hyperbolicRomCapacity emptyLawLedger
+initGenesisEpoch = MkEpochState 1 0 Stage1.FourGeometries.hyperbolicRomCapacity emptyLawLedger
 
 ||| Advances the epoch state by executing expansion (f_*) followed by collapse (f^*) rebound,
 ||| accumulating Chromogeometric law fingerprints in the dark matter ledger.

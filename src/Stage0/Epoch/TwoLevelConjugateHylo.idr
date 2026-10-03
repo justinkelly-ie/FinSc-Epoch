@@ -34,6 +34,11 @@ public export
 epochCoalgebra : StrictEpoch -> List StrictEpoch
 epochCoalgebra (MkStrict st) = [MkStrict (advanceEpochState st)]
 
+||| Deforested single-step epoch state transition without intermediate heap list allocation.
+public export
+epochStep : StrictEpoch -> StrictEpoch
+epochStep (MkStrict st) = MkStrict (advanceEpochState st)
+
 ||| Subfibration Reflection Natural Transformation (eta): maps Outer StrictLevel to Inner HomotopyLevel.
 public export
 epochNaturalTransform : StrictEpoch -> HomotopyEpoch
@@ -50,6 +55,22 @@ epochAlgebra (MkHomotopy (BoxSpace _ st)) =
 -- 3. 2LTT CONJUGATE HYLOMORPHISM EVALUATION ENGINE
 --------------------------------------------------------------------------------
 
+||| Structurally total 2LTT Conjugate Hylomorphism epoch progression bounded by exact step count.
+||| Eliminates external Fuel and intermediate List allocations, proving termination structurally on Nat.
+public export
+eval2LTTEpochBounded : (steps : Nat) -> StrictEpoch -> StrictEpoch
+eval2LTTEpochBounded Z st = st
+eval2LTTEpochBounded (S k) st =
+  let h = epochNaturalTransform st
+      s = epochAlgebra h
+  in eval2LTTEpochBounded k s
+
+||| Canonical 2LTT Conjugate Hylomorphism evaluation for the 37-epoch cosmic observer trajectory.
+||| Fully total without Fuel.
+public export
+evalObserver37ConjugateHylo : StrictEpoch -> StrictEpoch
+evalObserver37ConjugateHylo = eval2LTTEpochBounded 37
+
 ||| Evaluates deforested 2LTT Conjugate Hylomorphism epoch progression over Prime 13 fuel.
 public export covering
 eval2LTTEpochConjugateHylo : Fuel -> StrictEpoch -> StrictEpoch
@@ -58,6 +79,7 @@ eval2LTTEpochConjugateHylo (More f') st =
   let h = epochNaturalTransform st
       s = epochAlgebra h
   in eval2LTTEpochConjugateHylo f' s
+
 
 --------------------------------------------------------------------------------
 -- 4. QTT 0 ERASED 2LTT SUBFIBRATION DUALITY PROOF WITNESS

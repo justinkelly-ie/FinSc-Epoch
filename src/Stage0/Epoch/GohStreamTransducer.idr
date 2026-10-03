@@ -20,6 +20,15 @@ public export
 prime13Fuel : Fuel
 prime13Fuel = limit 13
 
+||| Evaluates a Goh energy stream transducer over a Dark Energy law ledger using an exact Nat step count.
+public export
+evalGohEnergyStreamNat : Nat -> Nat -> ChromogeometryLawLedger -> List GohEnergyStep -> List GohEnergyStep
+evalGohEnergyStreamNat Z _ _ acc = acc
+evalGohEnergyStreamNat (S steps) k ledger acc =
+  let totalLaws = countTotalDarkLaws ledger
+      gohStep   = MkGohStep (k * 13) (S totalLaws)
+  in evalGohEnergyStreamNat steps (S k) ledger (gohStep :: acc)
+
 ||| Evaluates a Goh energy stream transducer over a Dark Energy law ledger using Prime 13 fuel.
 public export covering
 evalGohEnergyStream : Fuel -> Nat -> ChromogeometryLawLedger -> List GohEnergyStep -> List GohEnergyStep
@@ -28,6 +37,17 @@ evalGohEnergyStream (More f') k ledger acc =
   let totalLaws = countTotalDarkLaws ledger
       gohStep   = MkGohStep (k * 13) (S totalLaws)
   in evalGohEnergyStream f' (S k) ledger (gohStep :: acc)
+
+||| Deforested stream unfolding of Goh energy steps using exact Nat steps without Fuel.
+public export
+streamGohEnergyStreamNat : Nat -> Nat -> ChromogeometryLawLedger -> FusedStream GohEnergyStep
+streamGohEnergyStreamNat maxSteps initK ledger =
+  unfoldStream (\(steps, k) => case steps of
+                                 Z => Done
+                                 S steps' =>
+                                   let totalLaws = countTotalDarkLaws ledger
+                                       gohStep   = MkGohStep (k * 13) (S totalLaws)
+                                   in Yield gohStep (steps', S k)) (maxSteps, initK)
 
 ||| Deforested stream unfolding of Goh energy steps using Prime 13 fuel without intermediate list allocations.
 public export covering

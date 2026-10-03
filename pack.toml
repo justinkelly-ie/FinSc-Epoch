@@ -1,4 +1,24 @@
-[custom.all.FinSc-Epoch]
-type = "local"
-path = "."
+[package]
+name = "FinSc-Epoch"
+version = "0.1.3"
 ipkg = "FinSc-Epoch.ipkg"
+
+[custom.all.FinSc-Multiset-Core]
+type = "local"
+path = "../FinSc-Multiset-Core"
+ipkg = "FinSc-Multiset-Core.ipkg"
+
+[custom.all.FinSc-Multiset-Transform]
+type = "local"
+path = "../FinSc-Multiset-Transform"
+ipkg = "FinSc-Multiset-Transform.ipkg"
+
+[custom.all.FinSc-Geometry]
+type = "local"
+path = "../FinSc-Geometry"
+ipkg = "FinSc-Geometry.ipkg"
+
+[custom.all.FinSc-Cosmology]
+type = "local"
+path = "../FinSc-Cosmology"
+ipkg = "FinSc-Cosmology.ipkg"

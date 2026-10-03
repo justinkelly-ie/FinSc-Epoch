@@ -8,6 +8,8 @@ import Stage1.Epoch.ChromogeometryLaw
 import Stage0.Epoch.GohStreamTransducer
 import Stage0.OnSeq.FusedStream
 import Stage1.Epoch.ExpansionCollapse
+import Stage1.Goh
+
 
 %default total
 
@@ -41,6 +43,27 @@ advanceN (S k) st = advanceN k (advanceEpochState st)
 public export
 getEpoch37State : EpochState
 getEpoch37State = advanceN 36 initGenesisEpoch
+
+--------------------------------------------------------------------------------
+-- 1A. STAGED SPREAD COMPOSITIONAL SCALE TRANSITION (Cigler & Herbig 2026, Prop 4.2)
+--------------------------------------------------------------------------------
+
+||| Evaluates a composite multi-scale epoch jump: Z_{mn}(s) = (Z_m ∘ Z_n)(s)
+||| Evaluates polynomial composition directly using Horner's rule without sequential iteration.
+public export
+stagedEpochSpreadJump : GohAuxiliary d1 -> GohAuxiliary d2 -> UnixelFraction -> UnixelFraction
+stagedEpochSpreadJump polyM polyN s = evalSpreadCompose polyM polyN s
+
+||| Evaluates multi-scale epoch transitions over an allocation-free deforested stream.
+public export
+stagedEpochSpreadJumpStream : GohAuxiliary d1 -> GohAuxiliary d2 -> FusedStream UnixelFraction -> FusedStream UnixelFraction
+stagedEpochSpreadJumpStream polyM polyN st = evalSpreadComposeStream polyM polyN st
+
+||| QTT 0 erased proof witness verifying that identity jump Z_1(Z_1(5)) preserves spread value 5:
+public export
+0 prfStagedEpochJumpIdentity : evalGohPolyInt GohPsi1 (evalGohPolyInt GohPsi1 5) = 5
+prfStagedEpochJumpIdentity = Refl
+
 
 
 --------------------------------------------------------------------------------
@@ -112,6 +135,13 @@ public export covering
 fusedTakeCyclicEpochs : Nat -> Nat -> EpochState -> FusedStream EpochState
 fusedTakeCyclicEpochs winSize totalSteps initSt =
   fusedTake winSize (streamCyclicEpochs totalSteps initSt)
+
+||| Audits Primorial 210 budget conservation across cyclic rebounds using total structural Nat recursion.
+public export
+auditCyclicBudgetClosureNat : Nat -> EpochState -> Bool
+auditCyclicBudgetClosureNat n initSt =
+  all (\st => (st.visibleBaryons + st.darkEnergy + countTotalDarkLaws st.darkMatterLedger) <= 210)
+      (simulateCyclicEpochs n initSt)
 
 ||| Audits Primorial 210 budget conservation across infinite cyclic rebounds.
 public export covering

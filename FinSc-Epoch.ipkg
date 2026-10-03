@@ -7,6 +7,8 @@ depends = base, linear, FinSc-Geometry, FinSc-Multiset-Core, FinSc-Multiset-Tran
 sourcedir = "src"
 
 modules = Epoch,
+          Epoch.Stage0,
+          Epoch.Stage1,
           Stage0.Epoch.GohStreamTransducer,
           Stage0.Epoch.PrimeGohFactorization,
           Stage0.Epoch.StateSpaceExhaustion,
